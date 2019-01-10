@@ -1,0 +1,13 @@
+{
+    "ifttt":
+        {
+            "event":"new_willhaben_entry",
+            "key":"INSERT_YOUR_MAKER_WEBHOOK_KEY_HERE"
+        },
+    "jobs":[
+        {
+            "url":"INSERT_A_FULL_WILLHABEN_SEARCH_RESULT_URL_HERE",
+            "lastId":0
+        }
+    ]
+}
