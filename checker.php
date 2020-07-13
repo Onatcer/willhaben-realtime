@@ -3,6 +3,8 @@
 require __DIR__ . '/vendor/autoload.php';
 use Goutte\Client;
 
+$ifttt = false;
+
 $client = new Client();
 
 $strJsonFileContents = file_get_contents("config.json");
@@ -16,13 +18,13 @@ foreach($jobs as $key => $job){
     $crawler = $client->request('GET', $job->url);
     $crawler->filter('.search-result-entry:not(#wh_adition_FakeAd1)')->each(function ($node) use ($client, &$newLastId, $job, $ifttt) {
         if(count($node->children()->filter('.content-section')) != 0){
-            
+
             $id = (int)trim($node->children()->filter('.content-section')->children('.header')->children('a')->attr('data-ad-link'));
 
             $newLastId = max($newLastId, $id);
 
             if($id > $job->lastId){
-                
+
                 $ad_url = "https://www.willhaben.at".trim($node->children()->filter('.content-section')->children('.header')->children('a')->attr('href'));
                 $crawler = $client->request('GET', $ad_url);
 
@@ -32,14 +34,19 @@ foreach($jobs as $key => $job){
                 $url = trim($node->children()->filter('.content-section')->children('.header')->children('a')->attr('href'));
                 $title = trim($node->children()->filter('.content-section')->children('.header')->children('a')->text());
 
-                $url = 'https://maker.ifttt.com/trigger/'.$ifttt->event.'/with/key/'.$ifttt->key;
-                $ch = curl_init($url);
-                $xml = "value1=".$title."&value2=".$price."&value3=".$ad_url;
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
-                
-                $response = curl_exec($ch);
-                curl_close($ch);
+
+                if($ifttt === true){
+                    $url = 'https://maker.ifttt.com/trigger/'.$ifttt->event.'/with/key/'.$ifttt->key;
+                    $ch = curl_init($url);
+                    $xml = "value1=".$title."&value2=".$price."&value3=".$ad_url;
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
+                }
+                mail("me@onatcer.com", $title. " / " . $price , $title. " / " . $price . " " . $ad_url, "From: Onatcer <me@onatcer.com>");
 
                 print $title." (".$id.") for ".$price."\n";
             }

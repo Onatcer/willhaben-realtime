@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  ### Workspace Utilities ##################################
+  willhaben-realtime:
+    build:
+      context: .
+    volumes:
+      - ../:/var/www/html
